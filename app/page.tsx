@@ -2,6 +2,7 @@
 
 import NeonNav from "@/components/neonnav";
 import SocialButtons from "@/components/social-buttons";
+import SignUpButton from "@/components/signup";
 import { useState } from "react";
 
 const tabData = [
@@ -9,10 +10,11 @@ const tabData = [
   { id: "participants", label: "Dla uczestników", bg: "bg-purple-900/60", text: "Tab: Dla uczestników" },
   { id: "rules", label: "Regulamin", bg: "bg-green-900/60", text: "Tab: Regulamin" },
   { id: "contact", label: "Kontakt", bg: "bg-yellow-900/60", text: "Tab: Kontakt" },
+  { id: "form", label: "Formularz", bg: "bg-blue-900/60", text: "Tab: Formularz" },
 ];
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState("home"); // "home" = Strona Główna domyślnie
+  const [activeTab, setActiveTab] = useState("home");
 
   return (
     <div className="min-h-screen bg-black">
@@ -20,8 +22,9 @@ export default function Home() {
         <div className="flex-1 flex justify-center">
           <NeonNav onTabChange={setActiveTab} />
         </div>
-        <div className="absolute right-24">
+        <div className="absolute right-24 flex items-center gap-4">
           <SocialButtons />
+          <SignUpButton />
         </div>
       </div>
       <main className="flex flex-col items-center justify-center min-h-[60vh] relative">

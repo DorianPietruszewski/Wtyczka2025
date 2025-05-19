@@ -132,3 +132,22 @@
   border-color: #38bdf8;
   transform: scale(1.06);
 }
+
+@layer utilities {
+  @keyframes arrow-move {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(4px);
+    }
+  }
+
+  .animate-arrow-move {
+    animation: arrow-move 1s ease-in-out infinite;
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+}
