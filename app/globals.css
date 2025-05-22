@@ -133,6 +133,11 @@
   transform: scale(1.06);
 }
 
+.neon-text {
+  text-shadow: 0 0 8px #38bdf8, 0 0 16px #0ea5e9, 0 0 32px #22d3ee;
+  color: #67e8f9;
+}
+
 @layer utilities {
   @keyframes arrow-move {
     0%,

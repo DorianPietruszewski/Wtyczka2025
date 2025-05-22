@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss"
 
 const config = {
-  darkMode: ["class"],
+  darkMode: 'class',
   content: [
     "./pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -68,9 +68,21 @@ const config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      boxShadow: {
+        'neon-cyan': '0 0 16px 2px rgba(34,211,238,0.7), 0 0 32px 6px rgba(34,211,238,0.4)',
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    function (pluginApi: any) {
+      pluginApi.addUtilities({
+        '.neon-border': {
+          border: '2px solid #22d3ee',
+          boxShadow: '0 0 16px 2px rgba(34,211,238,0.7), 0 0 32px 6px rgba(34,211,238,0.4)',
+        },
+      })
+    },
+  ],
 } satisfies Config
 
 export default config

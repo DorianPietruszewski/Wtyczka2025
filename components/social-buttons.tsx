@@ -9,7 +9,7 @@ export default function SocialButtons() {
         target="_blank"
         rel="noopener noreferrer"
         style={{ height: '50.4px', width: '50.4px' }}
-        className="flex items-center justify-center rounded-full border-2 border-cyan-400 bg-transparent text-cyan-300 shadow-[0_0_16px_2px_rgba(34,211,238,0.5)] transition-all hover:scale-105 hover:shadow-[0_0_32px_6px_rgba(34,211,238,0.8)] hover:text-cyan-100 hover:ring-2 hover:ring-cyan-400 focus:outline-none focus:ring-0 cursor-pointer"
+        className="flex items-center justify-center rounded-full border-2 border-cyan-400 bg-transparent text-cyan-300 shadow-[0_0_16px_2px_rgba(34,211,238,0.5)] transition-all hover:scale-105 hover:shadow-[0_0_32px_6px_rgba(34,211,238,0.8)] hover:text-cyan-100 focus:outline-none focus:ring-0 cursor-pointer"
         aria-label="Facebook"
       >
         <Facebook size={22} />
