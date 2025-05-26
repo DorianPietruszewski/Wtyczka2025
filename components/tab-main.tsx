@@ -13,8 +13,7 @@ export default function MainTab() {
   return (
     <section className="flex flex-col items-center justify-center w-full min-h-[60vh] gap-8">
       <div className="flex flex-col items-center gap-4 mt-8">
-        <img src="/ikona.ico" alt="Logo Wtyczka 2025" className="w-40 h-40 neon-border drop-shadow-[0_0_32px_#22d3ee]" />
-        <h1 className="text-4xl md:text-5xl font-extrabold text-cyan-200 neon-text text-center drop-shadow-[0_0_32px_#22d3ee]">Wtyczka 2025</h1>
+        <img src="/wtyczka.png" alt="Logo Wtyczka 2025" className="w-60 h-60 drop-shadow-[0_0_32px_#22d3ee]" />
       </div>
       <div className="w-full max-w-2xl">
         <Carousel>

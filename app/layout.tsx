@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   icons: {
     icon: "/ikona.ico",
   },
-};
+}; 
 
 export default function RootLayout({
   children,
