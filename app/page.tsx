@@ -4,6 +4,7 @@ import Image from "next/image";
 import NeonNav from "@/components/neonnav";
 import SocialButtons from "@/components/social-buttons";
 import SignUpButton from "@/components/signup";
+import Countdown from "@/components/countdown";
 import { useState } from "react";
 
 export default function Home() {
@@ -14,6 +15,7 @@ export default function Home() {
       <header className="flex flex-col items-center justify-center pt-16 pb-8 gap-6">
         <Image src="/wtyczka.png" alt="Logo Wtyczka 2025" width={320} height={320} className="w-80 h-80 drop-shadow-[0_0_64px_#22d3ee]" />
         <SignUpButton />
+        <Countdown />
       </header>
       <nav className="flex justify-center items-center gap-6 mb-8 mt-16">
         <NeonNav onTabChange={setActiveTab} />
