@@ -6,25 +6,27 @@ const EVENT_DATE = new Date(2025, 8, 15, 8, 0, 0);
 function getTimeLeft() {
   const now = new Date();
   const diff = EVENT_DATE.getTime() - now.getTime();
-  if (diff <= 0) return { days: 0, hours: 0 };
+  if (diff <= 0) return { days: 0, hours: 0, minutes: 0 };
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
   const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  return { days, hours };
+  const minutes = Math.floor((diff / (1000 * 60)) % 60);
+  return { days, hours, minutes };
 }
 
 export default function Countdown() {
   const [timeLeft, setTimeLeft] = useState(getTimeLeft());
 
   useEffect(() => {
+    // Zmieniamy interwał na 1 sekundę, aby licznik minut był zawsze aktualny
     const timer = setInterval(() => {
       setTimeLeft(getTimeLeft());
-    }, 60 * 1000); // aktualizuj co minutę
+    }, 1000);
     return () => clearInterval(timer);
   }, []);
 
   // Neonowa karta z gradientem, jednolity rozmiar tekstu
   return (
-    <div className="relative flex flex-col items-center justify-center px-8 py-5 rounded-2xl border-2 border-cyan-400/60 bg-gradient-to-br from-black/70 via-[#0f172a]/80 to-[#0e7490]/60 shadow-xl max-w-xs">
+    <div className="relative inline-flex flex-col items-center justify-center px-8 py-5 mt-10 rounded-2xl border-2 border-cyan-400/60 bg-gradient-to-br from-black/70 via-[#0f172a]/80 to-[#0e7490]/60 shadow-xl">
       <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-cyan-900 rounded-full p-2 shadow-lg border-2 border-cyan-400">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
           <rect
@@ -51,11 +53,19 @@ export default function Countdown() {
         <span className="text-2xl font-semibold text-cyan-400 tracking-wider">
           dni
         </span>
+        {/* Oryginalny blok godzin */}
         <span className="text-5xl font-extrabold text-cyan-300 drop-shadow-lg ml-4">
           {timeLeft.hours}
         </span>
         <span className="text-2xl font-semibold text-cyan-400 tracking-wider">
           godz
+        </span>
+        {/* Skopiowany blok minut */}
+        <span className="text-5xl font-extrabold text-cyan-300 drop-shadow-lg ml-4">
+          {timeLeft.minutes}
+        </span>
+        <span className="text-2xl font-semibold text-cyan-400 tracking-wider">
+          min
         </span>
       </div>
       <style jsx>{`

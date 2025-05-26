@@ -12,12 +12,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-black via-[#0f172a] to-[#0e7490] text-white">
-      <header className="flex flex-col items-center justify-center pt-16 pb-8 gap-6">
+      <header className="flex flex-col items-center justify-center pt-16 pb-8 gap-4">
         <Image src="/wtyczka.png" alt="Logo Wtyczka 2025" width={320} height={320} className="w-80 h-80 drop-shadow-[0_0_64px_#22d3ee]" />
         <SignUpButton />
         <Countdown />
       </header>
-      <nav className="flex justify-center items-center gap-6 mb-8 mt-16">
+      <nav className="flex justify-center items-center gap-4 mb-6 mt-6">
         <NeonNav onTabChange={setActiveTab} />
       </nav>
       <div className="flex-1" />
