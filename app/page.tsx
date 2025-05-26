@@ -50,7 +50,7 @@ export default function Home() {
       <nav
         className="flex justify-center items-center gap-1 mb-3 transition-all duration-700 ease-in-out"
         style={{
-          marginTop: activeTab === "home" ? "400px" : "40px",
+          marginTop: activeTab === "home" ? "400px" : "-191px",
         }}
       >
         <NeonNav onTabChange={setActiveTab} />

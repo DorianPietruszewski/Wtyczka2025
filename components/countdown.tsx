@@ -26,7 +26,7 @@ export default function Countdown() {
 
   // Neonowa karta z gradientem, jednolity rozmiar tekstu
   return (
-    <div className="relative inline-flex flex-col items-center justify-center px-8 py-5 mt-10 rounded-2xl border-2 border-cyan-400/60 bg-gradient-to-br from-black/70 via-[#0f172a]/80 to-[#0e7490]/60 shadow-xl">
+    <div className="relative inline-flex flex-col items-center justify-center px-8 py-5 -mt-10 rounded-2xl border-2 border-cyan-400/60 bg-gradient-to-br from-black/70 via-[#0f172a]/80 to-[#0e7490]/60 shadow-xl">
       <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-cyan-900 rounded-full p-2 shadow-lg border-2 border-cyan-400">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
           <rect
