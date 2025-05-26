@@ -5,18 +5,18 @@ import { ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export default function SignUpButton() {
-  const [isHovered, setIsHovered] = useState(false)
+	const [isHovered, setIsHovered] = useState(false)
 
-  return (
-    <button
-      className="flex items-center justify-center gap-2 px-8 py-2 rounded-full border-2 border-cyan-400 bg-cyan-400 text-black font-semibold text-lg transition-all duration-200 shadow-[0_0_16px_2px_rgba(34,211,238,0.5)] hover:bg-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-400 cursor-pointer"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <span>Zapisz się</span>
-      <ArrowRight className={cn("h-5 w-5 transition-transform duration-300", isHovered && "animate-arrow-move")} />
-    </button>
-  )
+	return (
+		<button
+			className="flex items-center justify-center gap-3 px-16 py-5 rounded-full bg-cyan-700/90 backdrop-blur-lg shadow-lg hover:shadow-[0_0_32px_8px_rgba(14,116,144,0.25)] border-4 border-cyan-400 border-solid transition-all duration-300 text-white font-bold text-2xl drop-shadow-[0_2px_12px_rgba(14,116,144,0.18)] animate-glow focus:outline-none focus:ring-2 focus:ring-cyan-400/60 cursor-pointer"
+			onMouseEnter={() => setIsHovered(true)}
+			onMouseLeave={() => setIsHovered(false)}
+		>
+			<span className="font-bold text-white drop-shadow-[0_2px_12px_rgba(14,116,144,0.22)]">Zapisz się</span>
+			<ArrowRight className={cn("h-6 w-6 transition-transform duration-300 text-white drop-shadow-[0_2px_12px_rgba(14,116,144,0.22)]", isHovered && "translate-x-2 scale-110")}/>
+		</button>
+	)
 }
 
 // Dodaj tę animację do globals.css lub do pliku tailwind.config.ts

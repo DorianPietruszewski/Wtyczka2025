@@ -152,6 +152,28 @@
   .animate-arrow-move {
     animation: arrow-move 1s ease-in-out infinite;
   }
+
+  @keyframes neon-glow {
+    0% {
+      box-shadow: 0 0 32px 4px #22d3ee, 0 0 64px 8px #22d3ee44;
+    }
+    75% {
+      box-shadow: 0 0 32px 4px #22d3ee, 0 0 64px 8px #22d3ee44;
+    }
+    88% {
+      box-shadow: 0 0 64px 12px #22d3ee, 0 0 128px 24px #22d3ee88;
+    }
+    100% {
+      box-shadow: 0 0 32px 4px #22d3ee, 0 0 64px 8px #22d3ee44;
+    }
+  }
+  .neon-glow {
+    box-shadow: 0 0 32px 4px #22d3ee, 0 0 64px 8px #22d3ee44;
+  }
+  .animate-glow {
+    animation: neon-glow 4.5s cubic-bezier(0.77,0,0.18,1) infinite;
+  }
+
   .text-balance {
     text-wrap: balance;
   }
