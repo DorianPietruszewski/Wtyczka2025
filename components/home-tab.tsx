@@ -11,6 +11,7 @@ import {
   CarouselPrevious,
   CarouselNext,
 } from "@/components/ui/carousel";
+import Image from "next/image";
 
 export default function HomeTab() {
   const [subTab, setSubTab] = useState("rejestracja");
@@ -19,13 +20,13 @@ export default function HomeTab() {
     <div className="w-full flex flex-col items-center gap-6 mt-6">
       {/* Logo i carousel */}
       <div className="flex flex-col md:flex-row items-center gap-8 w-full max-w-5xl justify-center">
-        <img src="/ikona.ico" alt="Logo Wtyczka 2025" className="w-32 h-32 neon-border" />
+        <Image src="/ikona.ico" alt="Logo Wtyczka 2025" width={128} height={128} className="w-32 h-32 neon-border" />
         <div className="w-full max-w-md relative">
           <Carousel>
             <CarouselContent>
-              <CarouselItem><img src="/file.svg" alt="Zdjęcie 1" className="rounded-xl neon-border w-full h-48 object-contain bg-black/40" /></CarouselItem>
-              <CarouselItem><img src="/globe.svg" alt="Zdjęcie 2" className="rounded-xl neon-border w-full h-48 object-contain bg-black/40" /></CarouselItem>
-              <CarouselItem><img src="/window.svg" alt="Zdjęcie 3" className="rounded-xl neon-border w-full h-48 object-contain bg-black/40" /></CarouselItem>
+              <CarouselItem><Image src="/file.svg" alt="Zdjęcie 1" width={192} height={192} className="rounded-xl neon-border w-full h-48 object-contain bg-black/40" /></CarouselItem>
+              <CarouselItem><Image src="/globe.svg" alt="Zdjęcie 2" width={192} height={192} className="rounded-xl neon-border w-full h-48 object-contain bg-black/40" /></CarouselItem>
+              <CarouselItem><Image src="/window.svg" alt="Zdjęcie 3" width={192} height={192} className="rounded-xl neon-border w-full h-48 object-contain bg-black/40" /></CarouselItem>
             </CarouselContent>
             <CarouselPrevious />
             <CarouselNext />

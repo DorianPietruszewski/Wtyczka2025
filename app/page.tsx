@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image";
 import NeonNav from "@/components/neonnav";
 import SocialButtons from "@/components/social-buttons";
 import SignUpButton from "@/components/signup";
@@ -17,7 +18,7 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-black via-[#0f172a] to-[#0e7490] text-white relative">
       <div className="flex items-center justify-between px-8 pt-8">
         <div className="flex items-center gap-4">
-          <img src="/wtyczka.png" alt="Logo Wtyczka 2025" className="w-24 h-24 drop-shadow-[0_0_32px_#22d3ee] bg-black/80 p-1 rounded-full" />
+          <Image src="/wtyczka.png" alt="Logo Wtyczka 2025" width={96} height={96} className="w-24 h-24 drop-shadow-[0_0_32px_#22d3ee] bg-black/80 p-1 rounded-full" />
         </div>
         <div className="flex-1 flex justify-center">
           <NeonNav onTabChange={setActiveTab} />
