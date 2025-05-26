@@ -8,6 +8,7 @@ import Countdown from "@/components/countdown";
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Toaster, toast } from "sonner";
+import { useLayoutEffect, useRef, useEffect } from "react";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("home");
@@ -15,23 +16,50 @@ export default function Home() {
   const [contactEmail, setContactEmail] = useState("");
   const [navDropdownOpen, setNavDropdownOpen] = useState(false);
 
+  // Dodaj stan do animacji wysuwanego top-bara
+  const [showTopBar, setShowTopBar] = useState(false);
+
+  // Zamykaj top-bar przy zmianie zakładki lub zamknięciu dropdowna
+  useEffect(() => {
+    if (!navDropdownOpen) setShowTopBar(false);
+  }, [navDropdownOpen, activeTab]);
+
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-black via-[#0f172a] to-[#0e7490] text-white">
-      <header className="relative flex flex-col items-center justify-center pt-16 pb-8 gap-4 min-h-[180px]">
-        <Image
-          src="/wtyczka.png"
-          alt="Logo Wtyczka 2025"
-          width={320}
-          height={320}
-          className={`drop-shadow-[0_0_64px_#22d3ee] z-10 absolute
-            transition-all duration-700 ease-in-out
-            ${
-              activeTab === "home"
-                ? "w-[23rem] h-[23rem] left-1/2 top-12 -translate-x-1/2 translate-y-0"
-                : "w-16 h-16 left-4 top-2 translate-x-0 translate-y-0"
-            }
-          `}
+    <div
+      className="min-h-screen flex flex-col bg-gradient-to-br from-black via-[#0f172a] to-[#0e7490] text-white"
+      style={
+        showTopBar && activeTab !== "home"
+          ? { paddingTop: `calc(var(--top-bar-height, 0px))` }
+          : undefined
+      }
+    >
+      {/* TopBar wysuwany tylko po kliknięciu hamburgera i tylko poza home */}
+      {showTopBar && activeTab !== "home" && (
+        <TopBar
+          setActiveTab={(tab) => {
+            setActiveTab(tab);
+            setShowTopBar(false);
+            setNavDropdownOpen(false);
+          }}
         />
+      )}
+      <header className="relative flex flex-col items-center justify-center pt-16 pb-8 gap-4 min-h-[180px]">
+        <a href="/" className="block">
+          <Image
+            src="/wtyczka.png"
+            alt="Logo Wtyczka 2025"
+            width={320}
+            height={320}
+            className={`drop-shadow-[0_0_64px_#22d3ee] z-10 absolute
+              transition-all duration-700 ease-in-out
+              ${
+                activeTab === "home"
+                  ? "w-[23rem] h-[23rem] left-1/2 top-12 -translate-x-1/2 translate-y-0"
+                  : "w-16 h-16 left-4 top-2 translate-x-0 translate-y-0"
+              }
+            `}
+          />
+        </a>
         {/* Przycisk zapisz się - pozycjonowanie i rozmiar zależne od aktywnej zakładki */}
         <button
           className={`z-10 absolute transition-all duration-700 ease-in-out whitespace-nowrap
@@ -65,13 +93,19 @@ export default function Home() {
               marginRight: "auto",
             }}
           >
-            {/* Show dropdown only if not enough space for 1200px (simulate with media query) */}
+            {/* Hamburger tylko na home pokazuje stare dropdown, poza home wysuwa top-bar */}
             <div className={`block ${activeTab === "home" ? "md:hidden" : "xl:hidden"} relative`}>
               <button
                 className={`relative flex items-center gap-2 bg-transparent shadow-none px-2 py-2 outline-none border-none focus:ring-0
                   ${activeTab === "home" ? "scale-200 mt-0 mb-4" : "scale-100 mt-8 mb-8"}
                 `}
-                onClick={() => setNavDropdownOpen((v) => !v)}
+                onClick={() => {
+                  if (activeTab === "home") {
+                    setNavDropdownOpen((v) => !v);
+                  } else {
+                    setShowTopBar((v) => !v);
+                  }
+                }}
                 aria-label="Otwórz menu"
                 style={{ background: "none", border: "none" }}
                 tabIndex={0}
@@ -81,14 +115,14 @@ export default function Home() {
                 <span className="flex flex-col justify-center items-center w-7 h-7 relative z-10
                   hover:cursor-pointer active:cursor-pointer
                 ">
-                  <span className={`block h-1 w-7 bg-cyan-400 rounded transition-all duration-300 ${navDropdownOpen ? "rotate-45 translate-y-2" : ""}`}></span>
-                  <span className={`block h-1 w-7 bg-cyan-400 rounded my-1 transition-all duration-300 ${navDropdownOpen ? "opacity-0" : ""}`}></span>
-                  <span className={`block h-1 w-7 bg-cyan-400 rounded transition-all duration-300 ${navDropdownOpen ? "-rotate-45 -translate-y-2" : ""}`}></span>
+                  <span className={`block h-1 w-7 bg-cyan-400 rounded transition-all duration-300 ${navDropdownOpen || showTopBar ? "rotate-45 translate-y-2" : ""}`}></span>
+                  <span className={`block h-1 w-7 bg-cyan-400 rounded my-1 transition-all duration-300 ${(navDropdownOpen || showTopBar) ? "opacity-0" : ""}`}></span>
+                  <span className={`block h-1 w-7 bg-cyan-400 rounded transition-all duration-300 ${navDropdownOpen || showTopBar ? "-rotate-45 -translate-y-2" : ""}`}></span>
                 </span>
               </button>
-              {navDropdownOpen && (
-                <div className="absolute left-1/2 -translate-x-1/2 mt-2 bg-black/90 border border-cyan-400 rounded-xl shadow-lg z-50 flex flex-col items-stretch w-max min-w-[180px]">
-                  {/* Zamiast <NeonNav /> własne przyciski */}
+              {/* Dropdown menu tylko na home */}
+              {activeTab === "home" && navDropdownOpen && (
+                <div className="absolute left-1/2 -translate-x-1/2 mt-2 bg-black/90 border border-cyan-400 rounded-xl shadow-lg z-50 flex flex-col items-stretch w-max min-w-[180px] animate-fade-in">
                   <button
                     className={`${
                       activeTab === "home" ? "py-4 px-10 text-xl" : "py-3 px-6 text-lg"
@@ -121,6 +155,15 @@ export default function Home() {
                   >
                     Kontakt
                   </button>
+                  <style jsx global>{`
+                    .animate-fade-in {
+                      animation: fadeInDropdown 0.3s cubic-bezier(0.4,0,0.2,1);
+                    }
+                    @keyframes fadeInDropdown {
+                      0% { opacity: 0; transform: translateY(-16px);}
+                      100% { opacity: 1; transform: translateY(0);}
+                    }
+                  `}</style>
                 </div>
               )}
             </div>
@@ -232,6 +275,70 @@ export default function Home() {
           className: "font-bold",
         }}
       />
+    </div>
+  );
+}
+
+// Animowany TopBar
+function TopBar({ setActiveTab }: { setActiveTab: (tab: string) => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (ref.current) {
+      document.documentElement.style.setProperty(
+        "--top-bar-height",
+        ref.current.offsetHeight + "px"
+      );
+    }
+    return () => {
+      document.documentElement.style.removeProperty("--top-bar-height");
+    };
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className="w-full h-auto py-2 bg-black fixed top-0 left-0 z-50 border-b-2 border-cyan-400 shadow-[0_2px_16px_0_#22d3ee99] flex flex-col items-center justify-center gap-1 animate-slide-down"
+      style={{
+        animation: "slideDown 0.35s cubic-bezier(0.4,0,0.2,1)"
+      }}
+    >
+      <button
+        className="py-2 px-6 text-cyan-300 hover:bg-cyan-900/40 transition-colors font-bold text-base text-center rounded w-full max-w-xs"
+        onClick={() => setActiveTab("home")}
+      >
+        Strona główna
+      </button>
+      <button
+        className="py-2 px-6 text-cyan-300 hover:bg-cyan-900/40 transition-colors font-bold text-base text-center rounded w-full max-w-xs"
+        onClick={() => setActiveTab("participants")}
+      >
+        Uczestnicy
+      </button>
+      <button
+        className="py-2 px-6 text-cyan-300 hover:bg-cyan-900/40 transition-colors font-bold text-base text-center rounded w-full max-w-xs"
+        onClick={() => setActiveTab("rules")}
+      >
+        Regulamin
+      </button>
+      <button
+        className="py-2 px-6 text-cyan-300 hover:bg-cyan-900/40 transition-colors font-bold text-base text-center rounded w-full max-w-xs"
+        onClick={() => setActiveTab("contact")}
+      >
+        Kontakt
+      </button>
+      <style jsx global>{`
+        @keyframes slideDown {
+          0% {
+            transform: translateY(-100%);
+            opacity: 0;
+          }
+          100% {
+            transform: translateY(0%);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   );
 }
