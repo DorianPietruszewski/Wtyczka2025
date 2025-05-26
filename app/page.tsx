@@ -18,11 +18,35 @@ export default function Home() {
 
   // Dodaj stan do animacji wysuwanego top-bara
   const [showTopBar, setShowTopBar] = useState(false);
+  const [topBarVisible, setTopBarVisible] = useState(false);
+
+  // Otwieranie/zamykanie top-bara z animacją
+  useEffect(() => {
+    if (showTopBar) setTopBarVisible(true);
+  }, [showTopBar]);
 
   // Zamykaj top-bar przy zmianie zakładki lub zamknięciu dropdowna
   useEffect(() => {
-    if (!navDropdownOpen) setShowTopBar(false);
+    if (!navDropdownOpen && activeTab !== "home") {
+      setTopBarVisible(false);
+      setTimeout(() => setShowTopBar(false), 350);
+    }
   }, [navDropdownOpen, activeTab]);
+
+  // Funkcja do obsługi kliknięcia hamburgera
+  const handleDropdownClick = () => {
+    if (activeTab === "home") {
+      setNavDropdownOpen((v) => !v);
+    } else {
+      if (showTopBar && topBarVisible) {
+        setTopBarVisible(false);
+        setTimeout(() => setShowTopBar(false), 350);
+      } else if (!showTopBar) {
+        setShowTopBar(true);
+        setTimeout(() => setTopBarVisible(true), 10);
+      }
+    }
+  };
 
   return (
     <div
@@ -33,13 +57,16 @@ export default function Home() {
           : undefined
       }
     >
-      {/* TopBar wysuwany tylko po kliknięciu hamburgera i tylko poza home */}
       {showTopBar && activeTab !== "home" && (
         <TopBar
+          visible={topBarVisible}
           setActiveTab={(tab) => {
-            setActiveTab(tab);
-            setShowTopBar(false);
-            setNavDropdownOpen(false);
+            setTopBarVisible(false);
+            setTimeout(() => {
+              setShowTopBar(false);
+              setActiveTab(tab);
+              setNavDropdownOpen(false);
+            }, 350);
           }}
         />
       )}
@@ -99,13 +126,7 @@ export default function Home() {
                 className={`relative flex items-center gap-2 bg-transparent shadow-none px-2 py-2 outline-none border-none focus:ring-0
                   ${activeTab === "home" ? "scale-200 mt-0 mb-4" : "scale-100 mt-8 mb-8"}
                 `}
-                onClick={() => {
-                  if (activeTab === "home") {
-                    setNavDropdownOpen((v) => !v);
-                  } else {
-                    setShowTopBar((v) => !v);
-                  }
-                }}
+                onClick={handleDropdownClick}
                 aria-label="Otwórz menu"
                 style={{ background: "none", border: "none" }}
                 tabIndex={0}
@@ -115,9 +136,9 @@ export default function Home() {
                 <span className="flex flex-col justify-center items-center w-7 h-7 relative z-10
                   hover:cursor-pointer active:cursor-pointer
                 ">
-                  <span className={`block h-1 w-7 bg-cyan-400 rounded transition-all duration-300 ${navDropdownOpen || showTopBar ? "rotate-45 translate-y-2" : ""}`}></span>
-                  <span className={`block h-1 w-7 bg-cyan-400 rounded my-1 transition-all duration-300 ${(navDropdownOpen || showTopBar) ? "opacity-0" : ""}`}></span>
-                  <span className={`block h-1 w-7 bg-cyan-400 rounded transition-all duration-300 ${navDropdownOpen || showTopBar ? "-rotate-45 -translate-y-2" : ""}`}></span>
+                  <span className={`block h-1 w-7 bg-cyan-400 rounded transition-all duration-300 ${navDropdownOpen || (showTopBar && topBarVisible) ? "rotate-45 translate-y-2" : ""}`}></span>
+                  <span className={`block h-1 w-7 bg-cyan-400 rounded my-1 transition-all duration-300 ${(navDropdownOpen || (showTopBar && topBarVisible)) ? "opacity-0" : ""}`}></span>
+                  <span className={`block h-1 w-7 bg-cyan-400 rounded transition-all duration-300 ${navDropdownOpen || (showTopBar && topBarVisible) ? "-rotate-45 -translate-y-2" : ""}`}></span>
                 </span>
               </button>
               {/* Dropdown menu tylko na home */}
@@ -280,7 +301,13 @@ export default function Home() {
 }
 
 // Animowany TopBar
-function TopBar({ setActiveTab }: { setActiveTab: (tab: string) => void }) {
+function TopBar({
+  setActiveTab,
+  visible = true,
+}: {
+  setActiveTab: (tab: string) => void;
+  visible?: boolean;
+}) {
   const ref = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
@@ -295,35 +322,42 @@ function TopBar({ setActiveTab }: { setActiveTab: (tab: string) => void }) {
     };
   }, []);
 
+  // Funkcja zamykająca z animacją
+  const handleTab = (tab: string) => {
+    setActiveTab(tab);
+  };
+
   return (
     <div
       ref={ref}
-      className="w-full h-auto py-2 bg-black fixed top-0 left-0 z-50 border-b-2 border-cyan-400 shadow-[0_2px_16px_0_#22d3ee99] flex flex-col items-center justify-center gap-1 animate-slide-down"
+      className={`w-full h-auto py-2 bg-black fixed top-0 left-0 z-50 border-b-2 border-cyan-400 shadow-[0_2px_16px_0_#22d3ee99] flex flex-col items-center justify-center gap-1
+        ${visible ? "animate-slide-down" : "animate-slide-up"}`}
       style={{
-        animation: "slideDown 0.35s cubic-bezier(0.4,0,0.2,1)"
+        animation: `${visible ? "slideDown" : "slideUp"} 0.35s cubic-bezier(0.4,0,0.2,1)`,
+        pointerEvents: visible ? "auto" : "none"
       }}
     >
       <button
         className="py-2 px-6 text-cyan-300 hover:bg-cyan-900/40 transition-colors font-bold text-base text-center rounded w-full max-w-xs"
-        onClick={() => setActiveTab("home")}
+        onClick={() => handleTab("home")}
       >
         Strona główna
       </button>
       <button
         className="py-2 px-6 text-cyan-300 hover:bg-cyan-900/40 transition-colors font-bold text-base text-center rounded w-full max-w-xs"
-        onClick={() => setActiveTab("participants")}
+        onClick={() => handleTab("participants")}
       >
         Uczestnicy
       </button>
       <button
         className="py-2 px-6 text-cyan-300 hover:bg-cyan-900/40 transition-colors font-bold text-base text-center rounded w-full max-w-xs"
-        onClick={() => setActiveTab("rules")}
+        onClick={() => handleTab("rules")}
       >
         Regulamin
       </button>
       <button
         className="py-2 px-6 text-cyan-300 hover:bg-cyan-900/40 transition-colors font-bold text-base text-center rounded w-full max-w-xs"
-        onClick={() => setActiveTab("contact")}
+        onClick={() => handleTab("contact")}
       >
         Kontakt
       </button>
@@ -336,6 +370,16 @@ function TopBar({ setActiveTab }: { setActiveTab: (tab: string) => void }) {
           100% {
             transform: translateY(0%);
             opacity: 1;
+          }
+        }
+        @keyframes slideUp {
+          0% {
+            transform: translateY(0%);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(-100%);
+            opacity: 0;
           }
         }
       `}</style>
