@@ -12,6 +12,7 @@ import { Toaster, toast } from "sonner";
 export default function Home() {
   const [activeTab, setActiveTab] = useState("home");
   const [contactMessage, setContactMessage] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-black via-[#0f172a] to-[#0e7490] text-white">
@@ -44,21 +45,37 @@ export default function Home() {
           <span className="font-bold text-white drop-shadow-[0_2px_12px_rgba(14,116,144,0.22)]">Zapisz się</span>
           <ArrowRight className="h-6 w-6 transition-transform duration-300 text-white drop-shadow-[0_2px_12px_rgba(14,116,144,0.22)]" />
         </button>
-        {/* Gładka animacja przesuwania treści w dół */}
-        <div
-          className="transition-all duration-700 ease-in-out w-full flex justify-center"
-          style={{
-            marginTop: activeTab === "home" ? "520px" : "40px",
-          }}
-        >
-          <Countdown />
-        </div>
+        {/* Usunięto licznik czasu z headera */}
       </header>
-      <nav className="flex justify-center items-center gap-1 mb-3 mt-2">
+      <nav
+        className="flex justify-center items-center gap-1 mb-3 transition-all duration-700 ease-in-out"
+        style={{
+          marginTop: activeTab === "home" ? "400px" : "40px",
+        }}
+      >
         <NeonNav onTabChange={setActiveTab} />
       </nav>
       {activeTab === "home" && (
-        <div className="text-center text-cyan-200 text-xl font-semibold mt-2">Witaj na stronie głównej!</div>
+        <>
+          <div
+            className="flex justify-center w-full transition-all duration-700 ease-in-out"
+            style={{
+              marginTop: "80px",
+            }}
+          >
+            <Countdown />
+          </div>
+          <div
+            className="transition-all duration-700 ease-in-out"
+            style={{
+              marginTop: "40px",
+            }}
+          >
+            <div className="text-center text-cyan-200 text-xl font-semibold mt-2">
+              Witaj na stronie głównej!
+            </div>
+          </div>
+        </>
       )}
       {activeTab === "participants" && (
         <div className="text-center text-cyan-200 text-xl font-semibold mt-2">Informacje dla uczestników.</div>
@@ -68,6 +85,7 @@ export default function Home() {
       )}
       {activeTab === "contact" && (
         <div className="flex flex-col items-center justify-center mt-2 w-full">
+          <h2 className="text-2xl font-bold text-cyan-200 mb-4 neon-text">Formularz kontaktowy:</h2>
           <form
             className="flex flex-col items-center w-full max-w-md gap-4 bg-black/60 neon-border rounded-xl p-6"
             onSubmit={e => {
@@ -75,6 +93,15 @@ export default function Home() {
               alert("Wiadomość została wysłana! (prototyp)");
             }}
           >
+            <input
+              type="email"
+              name="email"
+              required
+              value={contactEmail}
+              onChange={e => setContactEmail(e.target.value)}
+              className="w-full rounded-md border border-cyan-400 bg-black/60 text-cyan-200 p-2"
+              placeholder="Twój e-mail"
+            />
             <textarea
               name="message"
               required
