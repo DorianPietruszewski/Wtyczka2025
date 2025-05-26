@@ -7,9 +7,11 @@ import SignUpButton from "@/components/signup";
 import Countdown from "@/components/countdown";
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
+import { Toaster, toast } from "sonner";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("home");
+  const [contactMessage, setContactMessage] = useState("");
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-black via-[#0f172a] to-[#0e7490] text-white">
@@ -65,12 +67,67 @@ export default function Home() {
         <div className="text-center text-cyan-200 text-xl font-semibold mt-2">Regulamin wydarzenia.</div>
       )}
       {activeTab === "contact" && (
-        <div className="text-center text-cyan-200 text-xl font-semibold mt-2">Kontakt do organizatorów.</div>
+        <div className="flex flex-col items-center justify-center mt-2 w-full">
+          <form
+            className="flex flex-col items-center w-full max-w-md gap-4 bg-black/60 neon-border rounded-xl p-6"
+            onSubmit={e => {
+              e.preventDefault();
+              alert("Wiadomość została wysłana! (prototyp)");
+            }}
+          >
+            <textarea
+              name="message"
+              required
+              rows={5}
+              maxLength={10}
+              value={contactMessage}
+              onChange={e => {
+                if (e.target.value.length === 10 && contactMessage.length < 10) {
+                  toast.warning("Osiągnięto limit znaków");
+                }
+                setContactMessage(e.target.value);
+              }}
+              className="w-full rounded-md border border-cyan-400 bg-black/60 text-cyan-200 p-2 resize-none"
+              placeholder="Napisz swoją wiadomość... (max 10 znaków)"
+            />
+            <button
+              type="submit"
+              className="mt-2 bg-cyan-400 text-black font-bold hover:bg-cyan-300 neon-border rounded-md px-6 py-2 transition-colors"
+            >
+              Wyślij
+            </button>
+          </form>
+          <div className="mt-6 text-cyan-100 text-center space-y-1">
+            <div>
+              <b>Mail:</b> wtyczka2025@email.com
+            </div>
+            <div>
+              <b>Telefon:</b> 123 456 789
+            </div>
+            <div>
+              <b>Adres:</b> Politechnika, ul. Przykładowa 1, 00-000 Miasto
+            </div>
+          </div>
+        </div>
       )}
       <div className="flex-1" />
+      <div className="mb-8" />
       <footer className="w-full flex justify-center py-6 border-t border-cyan-900/40 bg-black/30">
         <SocialButtons />
       </footer>
+      <Toaster
+        position="bottom-right"
+        theme="dark"
+        toastOptions={{
+          style: {
+            background: "#7f1d1d",
+            color: "#fff",
+            border: "2px solid #dc2626",
+            boxShadow: "0 0 16px 2px #dc2626cc",
+          },
+          className: "font-bold",
+        }}
+      />
     </div>
   );
 }
