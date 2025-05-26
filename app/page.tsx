@@ -69,7 +69,7 @@ export default function Home() {
             <div className={`block ${activeTab === "home" ? "md:hidden" : "xl:hidden"} relative`}>
               <button
                 className={`relative flex items-center gap-2 bg-transparent shadow-none px-2 py-2 outline-none border-none focus:ring-0
-                  ${activeTab === "home" ? "scale-125 mt-0 mb-4" : "scale-150 mt-8 mb-8"}
+                  ${activeTab === "home" ? "scale-200 mt-0 mb-4" : "scale-100 mt-8 mb-8"}
                 `}
                 onClick={() => setNavDropdownOpen((v) => !v)}
                 aria-label="Otwórz menu"
@@ -87,8 +87,40 @@ export default function Home() {
                 </span>
               </button>
               {navDropdownOpen && (
-                <div className="absolute left-0 right-0 mt-2 bg-black/90 border border-cyan-400 rounded-xl shadow-lg z-50 flex flex-col items-stretch">
-                  <NeonNav onTabChange={(tab) => { setActiveTab(tab); setNavDropdownOpen(false); }} />
+                <div className="absolute left-1/2 -translate-x-1/2 mt-2 bg-black/90 border border-cyan-400 rounded-xl shadow-lg z-50 flex flex-col items-stretch w-max min-w-[180px]">
+                  {/* Zamiast <NeonNav /> własne przyciski */}
+                  <button
+                    className={`${
+                      activeTab === "home" ? "py-4 px-10 text-xl" : "py-3 px-6 text-lg"
+                    } text-cyan-300 hover:bg-cyan-900/40 border-b border-cyan-800 last:border-b-0 transition-colors font-bold text-center`}
+                    onClick={() => { setActiveTab("home"); setNavDropdownOpen(false); }}
+                  >
+                    Strona główna
+                  </button>
+                  <button
+                    className={`${
+                      activeTab === "home" ? "py-4 px-10 text-xl" : "py-3 px-6 text-lg"
+                    } text-cyan-300 hover:bg-cyan-900/40 border-b border-cyan-800 last:border-b-0 transition-colors font-bold text-center`}
+                    onClick={() => { setActiveTab("participants"); setNavDropdownOpen(false); }}
+                  >
+                    Uczestnicy
+                  </button>
+                  <button
+                    className={`${
+                      activeTab === "home" ? "py-4 px-10 text-xl" : "py-3 px-6 text-lg"
+                    } text-cyan-300 hover:bg-cyan-900/40 border-b border-cyan-800 last:border-b-0 transition-colors font-bold text-center`}
+                    onClick={() => { setActiveTab("rules"); setNavDropdownOpen(false); }}
+                  >
+                    Regulamin
+                  </button>
+                  <button
+                    className={`${
+                      activeTab === "home" ? "py-4 px-10 text-xl" : "py-3 px-6 text-lg"
+                    } text-cyan-300 hover:bg-cyan-900/40 transition-colors font-bold text-center`}
+                    onClick={() => { setActiveTab("contact"); setNavDropdownOpen(false); }}
+                  >
+                    Kontakt
+                  </button>
                 </div>
               )}
             </div>
