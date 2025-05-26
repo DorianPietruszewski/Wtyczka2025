@@ -13,6 +13,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("home");
   const [contactMessage, setContactMessage] = useState("");
   const [contactEmail, setContactEmail] = useState("");
+  const [navDropdownOpen, setNavDropdownOpen] = useState(false);
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-black via-[#0f172a] to-[#0e7490] text-white">
@@ -33,7 +34,7 @@ export default function Home() {
         />
         {/* Przycisk zapisz się - pozycjonowanie i rozmiar zależne od aktywnej zakładki */}
         <button
-          className={`z-10 absolute transition-all duration-700 ease-in-out
+          className={`z-10 absolute transition-all duration-700 ease-in-out whitespace-nowrap
             ${
               activeTab === "home"
                 ? "left-1/2 top-[440px] -translate-x-1/2 scale-110"
@@ -42,18 +43,62 @@ export default function Home() {
             flex items-center justify-center gap-3 px-20 py-6 rounded-full bg-cyan-700/90 backdrop-blur-lg shadow-lg hover:shadow-[0_0_32px_8px_rgba(14,116,144,0.25)] border-4 border-cyan-400 border-solid transition-all text-white font-bold text-2xl drop-shadow-[0_2px_12px_rgba(14,116,144,0.18)] animate-glow focus:outline-none focus:ring-2 focus:ring-cyan-400/60 cursor-pointer
           `}
         >
-          <span className="font-bold text-white drop-shadow-[0_2px_12px_rgba(14,116,144,0.22)]">Zapisz się</span>
+          <span className="font-bold text-white drop-shadow-[0_2px_12px_rgba(14,116,144,0.22)] whitespace-nowrap">Zapisz się</span>
           <ArrowRight className="h-6 w-6 transition-transform duration-300 text-white drop-shadow-[0_2px_12px_rgba(14,116,144,0.22)]" />
         </button>
         {/* Usunięto licznik czasu z headera */}
       </header>
       <nav
-        className="flex justify-center items-center gap-1 mb-3 transition-all duration-700 ease-in-out"
+        className="flex justify-center items-center gap-1 mb-3 transition-all duration-700 ease-in-out whitespace-nowrap"
         style={{
           marginTop: activeTab === "home" ? "400px" : "-191px",
         }}
       >
-        <NeonNav onTabChange={setActiveTab} />
+        {/* Responsive NeonNav: wrap in fixed-width container */}
+        <div className="w-full flex justify-center">
+          <div
+            className={`relative flex justify-center items-center`}
+            style={{
+              width: activeTab === "home" ? "100%" : "1200px",
+              maxWidth: "100%",
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}
+          >
+            {/* Show dropdown only if not enough space for 1200px (simulate with media query) */}
+            <div className={`block ${activeTab === "home" ? "md:hidden" : "xl:hidden"} relative`}>
+              <button
+                className={`relative flex items-center gap-2 bg-transparent shadow-none px-2 py-2 outline-none border-none focus:ring-0
+                  ${activeTab === "home" ? "scale-125 mt-0 mb-4" : "scale-150 mt-8 mb-8"}
+                `}
+                onClick={() => setNavDropdownOpen((v) => !v)}
+                aria-label="Otwórz menu"
+                style={{ background: "none", border: "none" }}
+                tabIndex={0}
+                onMouseDown={e => e.preventDefault()}
+              >
+                {/* Ikona hamburgera */}
+                <span className="flex flex-col justify-center items-center w-7 h-7 relative z-10
+                  hover:cursor-pointer active:cursor-pointer
+                ">
+                  <span className={`block h-1 w-7 bg-cyan-400 rounded transition-all duration-300 ${navDropdownOpen ? "rotate-45 translate-y-2" : ""}`}></span>
+                  <span className={`block h-1 w-7 bg-cyan-400 rounded my-1 transition-all duration-300 ${navDropdownOpen ? "opacity-0" : ""}`}></span>
+                  <span className={`block h-1 w-7 bg-cyan-400 rounded transition-all duration-300 ${navDropdownOpen ? "-rotate-45 -translate-y-2" : ""}`}></span>
+                </span>
+              </button>
+              {navDropdownOpen && (
+                <div className="absolute left-0 right-0 mt-2 bg-black/90 border border-cyan-400 rounded-xl shadow-lg z-50 flex flex-col items-stretch">
+                  <NeonNav onTabChange={(tab) => { setActiveTab(tab); setNavDropdownOpen(false); }} />
+                </div>
+              )}
+            </div>
+            <div
+              className={`hidden ${activeTab === "home" ? "md:flex" : "xl:flex"} whitespace-nowrap w-full justify-center`}
+            >
+              <NeonNav onTabChange={setActiveTab} />
+            </div>
+          </div>
+        </div>
       </nav>
       {activeTab === "home" && (
         <>
