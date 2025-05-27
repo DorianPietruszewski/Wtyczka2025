@@ -97,6 +97,7 @@ export default function Home() {
             }
             flex items-center justify-center gap-3 px-20 py-6 rounded-full bg-cyan-700/90 backdrop-blur-lg shadow-lg hover:shadow-[0_0_32px_8px_rgba(14,116,144,0.25)] border-4 border-cyan-400 border-solid transition-all text-white font-bold text-2xl drop-shadow-[0_2px_12px_rgba(14,116,144,0.18)] animate-glow focus:outline-none focus:ring-2 focus:ring-cyan-400/60 cursor-pointer
           `}
+          onClick={() => setActiveTab("signup")}
         >
           <span className="font-bold text-white drop-shadow-[0_2px_12px_rgba(14,116,144,0.22)] whitespace-nowrap">Zapisz się</span>
           <ArrowRight className="h-6 w-6 transition-transform duration-300 text-white drop-shadow-[0_2px_12px_rgba(14,116,144,0.22)]" />
@@ -219,7 +220,49 @@ export default function Home() {
         </>
       )}
       {activeTab === "participants" && (
-        <div className="text-center text-cyan-200 text-xl font-semibold mt-2">Informacje dla uczestników.</div>
+        <div className="text-center text-cyan-200 text-xl font-semibold mt-2">
+          Informacje dla uczestników.
+        </div>
+      )}
+      {activeTab === "signup" && (
+        <div className="flex flex-col items-center justify-center mt-2 w-full">
+          <h2 className="text-2xl font-bold text-cyan-200 mb-4 neon-text">Formularz zapisu:</h2>
+          <form
+            className="flex flex-col items-center w-full max-w-md gap-4 bg-black/60 neon-border rounded-xl p-6"
+            onSubmit={e => {
+              e.preventDefault();
+              alert("Formularz zapisu został wysłany! (prototyp)");
+            }}
+          >
+            <input
+              type="text"
+              name="firstName"
+              required
+              className="w-full rounded-md border border-cyan-400 bg-black/60 text-cyan-200 p-2"
+              placeholder="Imię"
+            />
+            <input
+              type="text"
+              name="lastName"
+              required
+              className="w-full rounded-md border border-cyan-400 bg-black/60 text-cyan-200 p-2"
+              placeholder="Nazwisko"
+            />
+            <input
+              type="email"
+              name="email"
+              required
+              className="w-full rounded-md border border-cyan-400 bg-black/60 text-cyan-200 p-2"
+              placeholder="Twój e-mail"
+            />
+            <button
+              type="submit"
+              className="mt-2 bg-cyan-400 text-black font-bold hover:bg-cyan-300 neon-border rounded-md px-6 py-2 transition-colors"
+            >
+              Zapisz się
+            </button>
+          </form>
+        </div>
       )}
       {activeTab === "rules" && (
         <div className="text-center text-cyan-200 text-xl font-semibold mt-2">Regulamin wydarzenia.</div>
