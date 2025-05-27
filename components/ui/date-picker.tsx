@@ -3,7 +3,7 @@
 import * as React from "react"
 import { format } from "date-fns"
 import { pl } from "date-fns/locale"
-import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react"
+import { CalendarIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -14,7 +14,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface DatePickerProps {
-  label?: string
   placeholder?: string
   value?: Date
   onChange?: (date: Date | undefined) => void
@@ -23,7 +22,6 @@ interface DatePickerProps {
 }
 
 export default function DatePicker({
-  label,
   placeholder,
   value,
   onChange,
@@ -35,9 +33,6 @@ export default function DatePicker({
   const [isOpen, setIsOpen] = React.useState(false)
   const [validationError, setValidationError] = React.useState<string>("")
   const [calendarMonth, setCalendarMonth] = React.useState<Date>(value || new Date())
-
-  const monthSelectRef = React.useRef<HTMLButtonElement>(null)
-  const yearSelectRef = React.useRef<HTMLButtonElement>(null)
 
   React.useEffect(() => {
     if (date) {
@@ -54,106 +49,112 @@ export default function DatePicker({
     }
   }, [value])
 
+  // Funkcja do walidacji daty (wspólna dla inputa i wyboru z kalendarza)
+  const validateDate = (dateToValidate: Date | undefined) => {
+    if (!dateToValidate) {
+      setValidationError("")
+      return false
+    }
+    const day = dateToValidate.getDate()
+    const month = dateToValidate.getMonth() + 1
+    const year = dateToValidate.getFullYear()
+    const currentYear = new Date().getFullYear()
+    const minYear = currentYear - 150
+    if (day < 1 || day > 31) {
+      setValidationError("Dzień musi być między 1 a 31")
+      return false
+    }
+    if (month < 1 || month > 12) {
+      setValidationError("Miesiąc musi być między 1 a 12")
+      return false
+    }
+    if (year < minYear || year > currentYear) {
+      setValidationError(`Rok musi być między ${minYear} a ${currentYear}`)
+      return false
+    }
+    // Sprawdzenie czy data rzeczywiście istnieje
+    const parsedDate = new Date(year, month - 1, day)
+    if (parsedDate.getDate() !== day || parsedDate.getMonth() !== month - 1 || parsedDate.getFullYear() !== year) {
+      setValidationError("Ta data nie istnieje")
+      return false
+    }
+    // Sprawdź czy data nie jest z przyszłości
+    const today = new Date()
+    today.setHours(23, 59, 59, 999)
+    if (parsedDate > today) {
+      setValidationError("Data nie może być z przyszłości")
+      return false
+    }
+    setValidationError("")
+    return true
+  }
+
   const handleDateSelect = (selectedDate: Date | undefined) => {
     setDate(selectedDate)
     onChange?.(selectedDate)
+    validateDate(selectedDate)
     setIsOpen(false)
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
-
-    // Usuń wszystkie nie-cyfry
     const numbersOnly = value.replace(/\D/g, "")
-
-    // Formatuj automatycznie
     let formattedValue = ""
-
     if (numbersOnly.length > 0) {
-      // Dzień (max 2 cyfry)
       formattedValue = numbersOnly.substring(0, 2)
-
       if (numbersOnly.length > 2) {
-        // Dodaj myślnik i miesiąc
         formattedValue += "-" + numbersOnly.substring(2, 4)
-
         if (numbersOnly.length > 4) {
-          // Dodaj myślnik i rok
           formattedValue += "-" + numbersOnly.substring(4, 8)
         }
       }
     }
-
     setInputValue(formattedValue)
 
-    // Wyczyść poprzednie błędy
-    setValidationError("")
-
-    // Jeśli mamy pełną datę (8 cyfr), spróbuj ją sparsować i zwalidować
+    // Waliduj tylko jeśli mamy dokładnie 8 cyfr
     if (numbersOnly.length === 8) {
       const day = Number.parseInt(numbersOnly.substring(0, 2))
       const month = Number.parseInt(numbersOnly.substring(2, 4))
       const year = Number.parseInt(numbersOnly.substring(4, 8))
-
-      // Sprawdź podstawowe zakresy
-      if (day < 1 || day > 31) {
-        setValidationError("Dzień musi być między 1 a 31")
-        setDate(undefined)
-        onChange?.(undefined)
-        return
+      // Sprawdź czy data jest poprawna bez tworzenia obiektu Date
+      if (
+        day >= 1 && day <= 31 &&
+        month >= 1 && month <= 12 &&
+        year >= (new Date().getFullYear() - 150) && year <= new Date().getFullYear()
+      ) {
+        // Sprawdź czy data istnieje i nie jest z przyszłości
+        const parsedDate = new Date(year, month - 1, day)
+        if (
+          parsedDate.getDate() === day &&
+          parsedDate.getMonth() === month - 1 &&
+          parsedDate.getFullYear() === year &&
+          parsedDate <= new Date(new Date().setHours(23, 59, 59, 999))
+        ) {
+          setDate(parsedDate)
+          onChange?.(parsedDate)
+          setCalendarMonth(parsedDate)
+          setValidationError("")
+        } else {
+          setValidationError("Ta data nie istnieje lub jest z przyszłości")
+        }
+      } else {
+        // Zakresy poza dozwolonymi
+        if (day < 1 || day > 31) setValidationError("Dzień musi być między 1 a 31")
+        else if (month < 1 || month > 12) setValidationError("Miesiąc musi być między 1 a 12")
+        else if (year < (new Date().getFullYear() - 150) || year > new Date().getFullYear()) setValidationError(`Rok musi być między ${new Date().getFullYear() - 150} a ${new Date().getFullYear()}`)
       }
-
-      if (month < 1 || month > 12) {
-        setValidationError("Miesiąc musi być między 1 a 12")
-        setDate(undefined)
-        onChange?.(undefined)
-        return
-      }
-
-      // Sprawdź zakres lat (150 lat wstecz od dzisiaj)
-      const currentYear = new Date().getFullYear()
-      const minYear = currentYear - 150
-
-      if (year < minYear || year > currentYear) {
-        setValidationError(`Rok musi być między ${minYear} a ${currentYear}`)
-        setDate(undefined)
-        onChange?.(undefined)
-        return
-      }
-
-      const parsedDate = new Date(year, month - 1, day)
-
-      // Sprawdzenie czy data rzeczywiście istnieje (np. 31 lutego nie istnieje)
-      if (parsedDate.getDate() !== day || parsedDate.getMonth() !== month - 1 || parsedDate.getFullYear() !== year) {
-        setValidationError("Ta data nie istnieje")
-        setDate(undefined)
-        onChange?.(undefined)
-        return
-      }
-
-      // Sprawdź czy data nie jest z przyszłości
-      const today = new Date()
-      today.setHours(23, 59, 59, 999) // Ustaw na koniec dnia, żeby dzisiejsza data była dozwolona
-
-      if (parsedDate > today) {
-        setValidationError("Data nie może być z przyszłości")
-        setDate(undefined)
-        onChange?.(undefined)
-        return
-      }
-
-      // Jeśli wszystko OK, ustaw datę
-      setDate(parsedDate)
-      onChange?.(parsedDate)
-      setCalendarMonth(parsedDate)
     } else {
-      // Jeśli data nie jest kompletna, wyczyść
-      if (date) {
-        setDate(undefined)
-        onChange?.(undefined)
-      }
+      // Jeśli niepełna data, nie zmieniaj daty ani komunikatu
     }
   }
+
+  React.useEffect(() => {
+    // Synchronizuj input tylko jeśli data została ustawiona przez props (np. z zewnątrz)
+    if (date && value && +date === +value) {
+      setInputValue(format(date, "dd-MM-yyyy"))
+    }
+    // Nie nadpisuj inputValue jeśli użytkownik wpisuje niepoprawną datę
+  }, [date, value])
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     // Pozwól na nawigację, backspace, delete, tab itp.
@@ -233,9 +234,10 @@ export default function DatePicker({
     setCalendarMonth(newDate)
   }
 
+  // W Popover przekazujemy isOpen i onOpenChange, aby kontrolować otwieranie/zamykanie
   return (
     <div className={cn("w-full", className)}>
-      <Popover>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
         <div className="relative">
           <input
             type="text"
@@ -264,16 +266,6 @@ export default function DatePicker({
         </div>
         <PopoverContent className="bg-black/90 border-cyan-400 text-cyan-200 rounded-md shadow-lg min-w-[20rem] max-w-[22rem] w-full">
           <div className="flex items-center justify-between gap-2 mb-2 w-full">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={handlePreviousMonth}
-              className="text-cyan-200 hover:bg-cyan-400 hover:text-black border border-cyan-400 bg-black/60 rounded-md"
-              tabIndex={-1}
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </Button>
             <div className="flex-1 flex justify-center gap-2">
               <Select value={calendarMonth.getMonth().toString()} onValueChange={handleMonthChange}>
                 <SelectTrigger className="rounded-md border border-cyan-400 bg-black/60 text-cyan-200 px-2 py-1 focus:ring-2 focus:ring-cyan-400 min-w-[7.5rem]">
@@ -296,16 +288,6 @@ export default function DatePicker({
                 </SelectContent>
               </Select>
             </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={handleNextMonth}
-              className="text-cyan-200 hover:bg-cyan-400 hover:text-black border border-cyan-400 bg-black/60 rounded-md"
-              tabIndex={-1}
-            >
-              <ChevronRight className="w-5 h-5" />
-            </Button>
           </div>
           <div className="flex justify-center">
             <Calendar

@@ -10,6 +10,7 @@ import { Toaster, toast } from "sonner";
 import { useLayoutEffect, useRef, useEffect } from "react";
 import RegistrationForm from "@/components/registration-form"; // Importujemy komponent na górze pliku
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("home");
@@ -270,12 +271,12 @@ export default function Home() {
               className="w-full rounded-md border border-cyan-400 bg-black/60 text-cyan-200 p-2 resize-none"
               placeholder="Napisz swoją wiadomość... (max 10 znaków)"
             />
-            <button
+            <Button
               type="submit"
               className="mt-2 bg-cyan-400 text-black font-bold hover:bg-cyan-300 neon-border rounded-md px-6 py-2 transition-colors"
             >
               Wyślij
-            </button>
+            </Button>
           </form>
           <div className="mt-6 text-cyan-100 text-center space-y-1">
             <div>
