@@ -23,8 +23,8 @@ interface DatePickerProps {
 }
 
 export default function DatePicker({
-  label = "Data",
-  placeholder = "Wybierz datę",
+  label,
+  placeholder,
   value,
   onChange,
   disabled = false,
@@ -35,6 +35,9 @@ export default function DatePicker({
   const [isOpen, setIsOpen] = React.useState(false)
   const [validationError, setValidationError] = React.useState<string>("")
   const [calendarMonth, setCalendarMonth] = React.useState<Date>(value || new Date())
+
+  const monthSelectRef = React.useRef<HTMLButtonElement>(null)
+  const yearSelectRef = React.useRef<HTMLButtonElement>(null)
 
   React.useEffect(() => {
     if (date) {
@@ -231,85 +234,80 @@ export default function DatePicker({
   }
 
   return (
-    <div className={cn("space-y-2", className)}>
-      {label && (
-        <Label htmlFor="date-input" className="text-sm font-medium">
-          {label}
-        </Label>
-      )}
-      <div className="relative">
-        <Popover open={isOpen} onOpenChange={setIsOpen}>
-          <div className="flex">
-            <Input
-              id="date-input"
-              type="text"
-              placeholder="dd-mm-yyyy"
-              value={inputValue}
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              onBlur={handleInputBlur}
+    <div className={cn("w-full", className)}>
+      <Popover>
+        <div className="relative">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={handleInputChange}
+            onBlur={handleInputBlur}
+            disabled={disabled}
+            className={cn(
+              "w-full rounded-md border border-cyan-400 bg-black/60 text-cyan-200 p-2 pr-10 focus:ring-2 focus:ring-cyan-400 font-mono tracking-wider",
+              validationError && "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+            )}
+            placeholder={placeholder}
+            aria-invalid={!!validationError}
+          />
+          <PopoverTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
               disabled={disabled}
-              className={cn(
-                "pr-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20 font-mono tracking-wider",
-                validationError && "border-red-500 focus:border-red-500 focus:ring-red-500/20",
-              )}
-            />
-            <PopoverTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                disabled={disabled}
-                className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
-              >
-                <CalendarIcon className="h-4 w-4 text-muted-foreground transition-colors hover:text-foreground" />
-                <span className="sr-only">Otwórz kalendarz</span>
-              </Button>
-            </PopoverTrigger>
-          </div>
-          <PopoverContent
-            className="w-auto p-0 shadow-lg border-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
-            align="start"
-          >
-            <div className="p-3 border-b bg-background/50">
-              <div className="flex items-center justify-between gap-2">
-                <Button variant="ghost" size="sm" onClick={handlePreviousMonth} className="h-8 w-8 p-0">
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-
-                <div className="flex gap-2">
-                  <Select value={calendarMonth.getMonth().toString()} onValueChange={handleMonthChange}>
-                    <SelectTrigger className="w-[120px] h-8">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {months.map((month) => (
-                        <SelectItem key={month.value} value={month.value.toString()}>
-                          {month.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  <Select value={calendarMonth.getFullYear().toString()} onValueChange={handleYearChange}>
-                    <SelectTrigger className="w-[80px] h-8">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {years.map((year) => (
-                        <SelectItem key={year} value={year.toString()}>
-                          {year}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Button variant="ghost" size="sm" onClick={handleNextMonth} className="h-8 w-8 p-0">
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
+              className="absolute right-0 top-0 h-full px-3 hover:bg-cyan-200 hover:text-black text-cyan-200 bg-black/60 border border-cyan-400 rounded-md"
+            >
+              <CalendarIcon className="h-4 w-4 text-cyan-200 transition-colors hover:text-black" />
+              <span className="sr-only">Otwórz kalendarz</span>
+            </Button>
+          </PopoverTrigger>
+        </div>
+        <PopoverContent className="bg-black/90 border-cyan-400 text-cyan-200 rounded-md shadow-lg min-w-[20rem] max-w-[22rem] w-full">
+          <div className="flex items-center justify-between gap-2 mb-2 w-full">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={handlePreviousMonth}
+              className="text-cyan-200 hover:bg-cyan-400 hover:text-black border border-cyan-400 bg-black/60 rounded-md"
+              tabIndex={-1}
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </Button>
+            <div className="flex-1 flex justify-center gap-2">
+              <Select value={calendarMonth.getMonth().toString()} onValueChange={handleMonthChange}>
+                <SelectTrigger className="rounded-md border border-cyan-400 bg-black/60 text-cyan-200 px-2 py-1 focus:ring-2 focus:ring-cyan-400 min-w-[7.5rem]">
+                  <SelectValue>{months[calendarMonth.getMonth()].label}</SelectValue>
+                </SelectTrigger>
+                <SelectContent className="bg-black/90 border-cyan-400 text-cyan-200">
+                  {months.map(m => (
+                    <SelectItem key={m.value} value={m.value.toString()}>{m.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={calendarMonth.getFullYear().toString()} onValueChange={handleYearChange}>
+                <SelectTrigger className="rounded-md border border-cyan-400 bg-black/60 text-cyan-200 px-2 py-1 focus:ring-2 focus:ring-cyan-400 min-w-[6rem]">
+                  <SelectValue>{calendarMonth.getFullYear()}</SelectValue>
+                </SelectTrigger>
+                <SelectContent className="bg-black/90 border-cyan-400 text-cyan-200 max-h-48 overflow-y-auto">
+                  {years.map(y => (
+                    <SelectItem key={y} value={y.toString()}>{y}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={handleNextMonth}
+              className="text-cyan-200 hover:bg-cyan-400 hover:text-black border border-cyan-400 bg-black/60 rounded-md"
+              tabIndex={-1}
+            >
+              <ChevronRight className="w-5 h-5" />
+            </Button>
+          </div>
+          <div className="flex justify-center">
             <Calendar
               mode="single"
               selected={date}
@@ -322,30 +320,24 @@ export default function DatePicker({
               className="rounded-md"
               classNames={{
                 head_row: "flex",
-                head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
+                head_cell: "text-cyan-300 rounded-md w-9 font-normal text-[0.8rem]",
                 row: "flex w-full mt-2",
-                cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
+                cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-cyan-900/50 [&:has([aria-selected])]:bg-cyan-400/80 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+                day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 text-cyan-200 hover:bg-cyan-400 hover:text-black",
                 day_range_end: "day-range-end",
-                day_selected:
-                  "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-                day_today: "bg-accent text-accent-foreground",
-                day_outside:
-                  "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
-                day_disabled: "text-muted-foreground opacity-50",
-                day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
+                day_selected: "bg-cyan-400 text-black hover:bg-cyan-300 hover:text-black focus:bg-cyan-400 focus:text-black",
+                day_today: "bg-cyan-900 text-cyan-200",
+                day_outside: "text-cyan-700 opacity-50 aria-selected:bg-cyan-400/50 aria-selected:text-black aria-selected:opacity-30",
+                day_disabled: "text-cyan-700 opacity-50",
+                day_range_middle: "aria-selected:bg-cyan-300 aria-selected:text-black",
                 day_hidden: "invisible",
               }}
             />
-          </PopoverContent>
-        </Popover>
-      </div>
-      {validationError ? (
-        <p className="text-xs text-red-500 font-medium">{validationError}</p>
-      ) : (
-        <p className="text-xs text-muted-foreground">
-          Wpisz 8 cyfr daty (ddmmrrrr) - format zostanie automatycznie zastosowany
-        </p>
+          </div>
+        </PopoverContent>
+      </Popover>
+      {validationError && (
+        <p className="text-xs text-red-500 font-medium mt-1">{validationError}</p>
       )}
     </div>
   )
