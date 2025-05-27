@@ -1,0 +1,352 @@
+"use client"
+
+import * as React from "react"
+import { format } from "date-fns"
+import { pl } from "date-fns/locale"
+import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react"
+
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
+interface DatePickerProps {
+  label?: string
+  placeholder?: string
+  value?: Date
+  onChange?: (date: Date | undefined) => void
+  disabled?: boolean
+  className?: string
+}
+
+export default function DatePicker({
+  label = "Data",
+  placeholder = "Wybierz datę",
+  value,
+  onChange,
+  disabled = false,
+  className,
+}: DatePickerProps) {
+  const [date, setDate] = React.useState<Date | undefined>(value)
+  const [inputValue, setInputValue] = React.useState("")
+  const [isOpen, setIsOpen] = React.useState(false)
+  const [validationError, setValidationError] = React.useState<string>("")
+  const [calendarMonth, setCalendarMonth] = React.useState<Date>(value || new Date())
+
+  React.useEffect(() => {
+    if (date) {
+      setInputValue(format(date, "dd-MM-yyyy"))
+    } else {
+      setInputValue("")
+    }
+  }, [date])
+
+  React.useEffect(() => {
+    setDate(value)
+    if (value) {
+      setCalendarMonth(value)
+    }
+  }, [value])
+
+  const handleDateSelect = (selectedDate: Date | undefined) => {
+    setDate(selectedDate)
+    onChange?.(selectedDate)
+    setIsOpen(false)
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+
+    // Usuń wszystkie nie-cyfry
+    const numbersOnly = value.replace(/\D/g, "")
+
+    // Formatuj automatycznie
+    let formattedValue = ""
+
+    if (numbersOnly.length > 0) {
+      // Dzień (max 2 cyfry)
+      formattedValue = numbersOnly.substring(0, 2)
+
+      if (numbersOnly.length > 2) {
+        // Dodaj myślnik i miesiąc
+        formattedValue += "-" + numbersOnly.substring(2, 4)
+
+        if (numbersOnly.length > 4) {
+          // Dodaj myślnik i rok
+          formattedValue += "-" + numbersOnly.substring(4, 8)
+        }
+      }
+    }
+
+    setInputValue(formattedValue)
+
+    // Wyczyść poprzednie błędy
+    setValidationError("")
+
+    // Jeśli mamy pełną datę (8 cyfr), spróbuj ją sparsować i zwalidować
+    if (numbersOnly.length === 8) {
+      const day = Number.parseInt(numbersOnly.substring(0, 2))
+      const month = Number.parseInt(numbersOnly.substring(2, 4))
+      const year = Number.parseInt(numbersOnly.substring(4, 8))
+
+      // Sprawdź podstawowe zakresy
+      if (day < 1 || day > 31) {
+        setValidationError("Dzień musi być między 1 a 31")
+        setDate(undefined)
+        onChange?.(undefined)
+        return
+      }
+
+      if (month < 1 || month > 12) {
+        setValidationError("Miesiąc musi być między 1 a 12")
+        setDate(undefined)
+        onChange?.(undefined)
+        return
+      }
+
+      // Sprawdź zakres lat (150 lat wstecz od dzisiaj)
+      const currentYear = new Date().getFullYear()
+      const minYear = currentYear - 150
+
+      if (year < minYear || year > currentYear) {
+        setValidationError(`Rok musi być między ${minYear} a ${currentYear}`)
+        setDate(undefined)
+        onChange?.(undefined)
+        return
+      }
+
+      const parsedDate = new Date(year, month - 1, day)
+
+      // Sprawdzenie czy data rzeczywiście istnieje (np. 31 lutego nie istnieje)
+      if (parsedDate.getDate() !== day || parsedDate.getMonth() !== month - 1 || parsedDate.getFullYear() !== year) {
+        setValidationError("Ta data nie istnieje")
+        setDate(undefined)
+        onChange?.(undefined)
+        return
+      }
+
+      // Sprawdź czy data nie jest z przyszłości
+      const today = new Date()
+      today.setHours(23, 59, 59, 999) // Ustaw na koniec dnia, żeby dzisiejsza data była dozwolona
+
+      if (parsedDate > today) {
+        setValidationError("Data nie może być z przyszłości")
+        setDate(undefined)
+        onChange?.(undefined)
+        return
+      }
+
+      // Jeśli wszystko OK, ustaw datę
+      setDate(parsedDate)
+      onChange?.(parsedDate)
+      setCalendarMonth(parsedDate)
+    } else {
+      // Jeśli data nie jest kompletna, wyczyść
+      if (date) {
+        setDate(undefined)
+        onChange?.(undefined)
+      }
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Pozwól na nawigację, backspace, delete, tab itp.
+    if (
+      e.key === "Backspace" ||
+      e.key === "Delete" ||
+      e.key === "Tab" ||
+      e.key === "ArrowLeft" ||
+      e.key === "ArrowRight" ||
+      e.key === "Home" ||
+      e.key === "End" ||
+      (e.ctrlKey && (e.key === "a" || e.key === "c" || e.key === "v" || e.key === "x"))
+    ) {
+      return
+    }
+
+    // Blokuj wszystko oprócz cyfr
+    if (!/\d/.test(e.key)) {
+      e.preventDefault()
+    }
+
+    // Blokuj wprowadzanie jeśli już mamy maksymalną długość (10 znaków: dd.mm.yyyy)
+    const currentValue = (e.target as HTMLInputElement).value
+    const numbersOnly = currentValue.replace(/\D/g, "")
+    if (numbersOnly.length >= 8 && /\d/.test(e.key)) {
+      e.preventDefault()
+    }
+  }
+
+  const handleInputBlur = () => {
+    // Jeśli data jest ustawiona, sformatuj input
+    if (date) {
+      setInputValue(format(date, "dd-MM-yyyy"))
+    }
+  }
+
+  // Generuj lata (150 lat wstecz od dzisiaj)
+  const currentYear = new Date().getFullYear()
+  const minYear = currentYear - 150
+  const years = Array.from({ length: 151 }, (_, i) => currentYear - i)
+
+  // Miesiące
+  const months = [
+    { value: 0, label: "Styczeń" },
+    { value: 1, label: "Luty" },
+    { value: 2, label: "Marzec" },
+    { value: 3, label: "Kwiecień" },
+    { value: 4, label: "Maj" },
+    { value: 5, label: "Czerwiec" },
+    { value: 6, label: "Lipiec" },
+    { value: 7, label: "Sierpień" },
+    { value: 8, label: "Wrzesień" },
+    { value: 9, label: "Październik" },
+    { value: 10, label: "Listopad" },
+    { value: 11, label: "Grudzień" },
+  ]
+
+  const handleMonthChange = (monthValue: string) => {
+    const newMonth = Number.parseInt(monthValue)
+    const newDate = new Date(calendarMonth.getFullYear(), newMonth, 1)
+    setCalendarMonth(newDate)
+  }
+
+  const handleYearChange = (yearValue: string) => {
+    const newYear = Number.parseInt(yearValue)
+    const newDate = new Date(newYear, calendarMonth.getMonth(), 1)
+    setCalendarMonth(newDate)
+  }
+
+  const handlePreviousMonth = () => {
+    const newDate = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1)
+    setCalendarMonth(newDate)
+  }
+
+  const handleNextMonth = () => {
+    const newDate = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1)
+    setCalendarMonth(newDate)
+  }
+
+  return (
+    <div className={cn("space-y-2", className)}>
+      {label && (
+        <Label htmlFor="date-input" className="text-sm font-medium">
+          {label}
+        </Label>
+      )}
+      <div className="relative">
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
+          <div className="flex">
+            <Input
+              id="date-input"
+              type="text"
+              placeholder="dd-mm-yyyy"
+              value={inputValue}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              onBlur={handleInputBlur}
+              disabled={disabled}
+              className={cn(
+                "pr-10 transition-all duration-200 focus:ring-2 focus:ring-primary/20 font-mono tracking-wider",
+                validationError && "border-red-500 focus:border-red-500 focus:ring-red-500/20",
+              )}
+            />
+            <PopoverTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={disabled}
+                className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+              >
+                <CalendarIcon className="h-4 w-4 text-muted-foreground transition-colors hover:text-foreground" />
+                <span className="sr-only">Otwórz kalendarz</span>
+              </Button>
+            </PopoverTrigger>
+          </div>
+          <PopoverContent
+            className="w-auto p-0 shadow-lg border-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+            align="start"
+          >
+            <div className="p-3 border-b bg-background/50">
+              <div className="flex items-center justify-between gap-2">
+                <Button variant="ghost" size="sm" onClick={handlePreviousMonth} className="h-8 w-8 p-0">
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+
+                <div className="flex gap-2">
+                  <Select value={calendarMonth.getMonth().toString()} onValueChange={handleMonthChange}>
+                    <SelectTrigger className="w-[120px] h-8">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {months.map((month) => (
+                        <SelectItem key={month.value} value={month.value.toString()}>
+                          {month.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={calendarMonth.getFullYear().toString()} onValueChange={handleYearChange}>
+                    <SelectTrigger className="w-[80px] h-8">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {years.map((year) => (
+                        <SelectItem key={year} value={year.toString()}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <Button variant="ghost" size="sm" onClick={handleNextMonth} className="h-8 w-8 p-0">
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={handleDateSelect}
+              disabled={disabled}
+              locale={pl}
+              month={calendarMonth}
+              onMonthChange={setCalendarMonth}
+              initialFocus
+              className="rounded-md"
+              classNames={{
+                head_row: "flex",
+                head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
+                row: "flex w-full mt-2",
+                cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+                day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
+                day_range_end: "day-range-end",
+                day_selected:
+                  "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+                day_today: "bg-accent text-accent-foreground",
+                day_outside:
+                  "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
+                day_disabled: "text-muted-foreground opacity-50",
+                day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
+                day_hidden: "invisible",
+              }}
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+      {validationError ? (
+        <p className="text-xs text-red-500 font-medium">{validationError}</p>
+      ) : (
+        <p className="text-xs text-muted-foreground">
+          Wpisz 8 cyfr daty (ddmmrrrr) - format zostanie automatycznie zastosowany
+        </p>
+      )}
+    </div>
+  )
+}

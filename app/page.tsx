@@ -3,12 +3,13 @@
 import Image from "next/image";
 import NeonNav from "@/components/neonnav";
 import SocialButtons from "@/components/social-buttons";
-import SignUpButton from "@/components/signup";
 import Countdown from "@/components/countdown";
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { useLayoutEffect, useRef, useEffect } from "react";
+import RegistrationForm from "@/components/registration-form"; // Importujemy komponent na górze pliku
+import Link from "next/link";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("home");
@@ -71,7 +72,7 @@ export default function Home() {
         />
       )}
       <header className="relative flex flex-col items-center justify-center pt-16 pb-8 gap-4 min-h-[180px]">
-        <a href="/" className="block">
+        <Link href="/" className="block">
           <Image
             src="/wtyczka.png"
             alt="Logo Wtyczka 2025"
@@ -86,7 +87,7 @@ export default function Home() {
               }
             `}
           />
-        </a>
+        </Link>
         {/* Przycisk zapisz się - pozycjonowanie i rozmiar zależne od aktywnej zakładki */}
         <button
           className={`z-10 absolute transition-all duration-700 ease-in-out whitespace-nowrap
@@ -227,41 +228,9 @@ export default function Home() {
       {activeTab === "signup" && (
         <div className="flex flex-col items-center justify-center mt-2 w-full">
           <h2 className="text-2xl font-bold text-cyan-200 mb-4 neon-text">Formularz zapisu:</h2>
-          <form
-            className="flex flex-col items-center w-full max-w-md gap-4 bg-black/60 neon-border rounded-xl p-6"
-            onSubmit={e => {
-              e.preventDefault();
-              alert("Formularz zapisu został wysłany! (prototyp)");
-            }}
-          >
-            <input
-              type="text"
-              name="firstName"
-              required
-              className="w-full rounded-md border border-cyan-400 bg-black/60 text-cyan-200 p-2"
-              placeholder="Imię"
-            />
-            <input
-              type="text"
-              name="lastName"
-              required
-              className="w-full rounded-md border border-cyan-400 bg-black/60 text-cyan-200 p-2"
-              placeholder="Nazwisko"
-            />
-            <input
-              type="email"
-              name="email"
-              required
-              className="w-full rounded-md border border-cyan-400 bg-black/60 text-cyan-200 p-2"
-              placeholder="Twój e-mail"
-            />
-            <button
-              type="submit"
-              className="mt-2 bg-cyan-400 text-black font-bold hover:bg-cyan-300 neon-border rounded-md px-6 py-2 transition-colors"
-            >
-              Zapisz się
-            </button>
-          </form>
+          <div className="flex flex-col items-center w-full max-w-md gap-4 bg-black/60 neon-border rounded-xl p-6">
+            <RegistrationForm />
+          </div>
         </div>
       )}
       {activeTab === "rules" && (

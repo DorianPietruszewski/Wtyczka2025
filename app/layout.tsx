@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Wtyczka - 2025",
   icons: {
-    icon: "/wtyczka.ico",
+    icon: "/ikona.ico",
   },
 }; 
 
