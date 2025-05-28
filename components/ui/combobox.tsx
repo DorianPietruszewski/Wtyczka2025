@@ -14,6 +14,7 @@ interface ComboBoxProps {
   name?: string;
   required?: boolean;
   className?: string;
+  renderValue?: (value: string, option?: ComboBoxOption) => React.ReactNode;
 }
 
 export const ComboBox: React.FC<ComboBoxProps> = ({
@@ -25,6 +26,7 @@ export const ComboBox: React.FC<ComboBoxProps> = ({
   name,
   required = false,
   className = "",
+  renderValue,
 }) => {
   const [open, setOpen] = useState(false);
   const [highlighted, setHighlighted] = useState<number>(-1);
@@ -80,16 +82,22 @@ export const ComboBox: React.FC<ComboBoxProps> = ({
         onClick={() => setOpen((o) => !o)}
         onKeyDown={handleKeyDown}
         tabIndex={0}
-        required={required}
       >
-        <span>{options.find((opt) => opt.value === value)?.label || <span className="text-cyan-600">{placeholder}</span>}</span>
+        <span>{
+
+          value
+            ? (renderValue
+                ? renderValue(value, options.find((opt) => opt.value === value))
+                : options.find((opt) => opt.value === value)?.label)
+            : <span className="text-cyan-600">{placeholder}</span>
+        }</span>
         <svg className="w-4 h-4 ml-2 inline" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
       </button>
       {open && (
         <ul
           id={`${name}-listbox`}
           role="listbox"
-          className="absolute z-10 mt-1 w-full bg-black border border-cyan-400 rounded-md shadow-lg max-h-60 overflow-auto"
+          className="absolute z-10 mt-1 min-w-[16rem] sm:min-w-[20rem] md:min-w-[24rem] max-w-[90vw] w-auto bg-black border border-cyan-400 rounded-md shadow-lg max-h-60 overflow-auto"
         >
           {options.map((opt, idx) => (
             <li
