@@ -24,7 +24,11 @@ export default function Home() {
 
   // Otwieranie/zamykanie top-bara z animacją
   useEffect(() => {
-    if (showTopBar) setTopBarVisible(true);
+    if (showTopBar) {
+      // Najpierw renderuj TopBar (schowany), potem ustaw widoczność z opóźnieniem, by animacja była płynna
+      const timeout = setTimeout(() => setTopBarVisible(true), 10);
+      return () => clearTimeout(timeout);
+    }
   }, [showTopBar]);
 
   // Zamykaj top-bar przy zmianie zakładki lub zamknięciu dropdowna
@@ -45,18 +49,18 @@ export default function Home() {
         setTimeout(() => setShowTopBar(false), 350);
       } else if (!showTopBar) {
         setShowTopBar(true);
-        setTimeout(() => setTopBarVisible(true), 10);
+        // NIE ustawiaj topBarVisible tutaj, zrobi to useEffect powyżej z opóźnieniem
       }
     }
   };
 
   return (
     <div
-      className="min-h-screen flex flex-col bg-gradient-to-br from-black via-[#0f172a] to-[#0e7490] text-white"
+      className="min-h-screen flex flex-col bg-gradient-to-br from-black via-[#0f172a] to-[#0e7490] text-white transition-[padding] duration-350"
       style={
-        showTopBar && activeTab !== "home"
+        topBarVisible && activeTab !== "home"
           ? { paddingTop: `calc(var(--top-bar-height, 0px))` }
-          : undefined
+          : { paddingTop: "0px" }
       }
     >
       {showTopBar && activeTab !== "home" && (
@@ -70,6 +74,7 @@ export default function Home() {
               setNavDropdownOpen(false);
             }, 350);
           }}
+          activeTab={activeTab}
         />
       )}
       <header className="relative flex flex-col items-center justify-center pt-16 pb-8 gap-4 min-h-[180px]">
@@ -194,7 +199,7 @@ export default function Home() {
             <div
               className={`hidden ${activeTab === "home" ? "md:flex" : "xl:flex"} whitespace-nowrap w-full justify-center`}
             >
-              <NeonNav onTabChange={setActiveTab} />
+              <NeonNav onTabChange={setActiveTab} activeTab={activeTab} />
             </div>
           </div>
         </div>
@@ -317,9 +322,11 @@ export default function Home() {
 function TopBar({
   setActiveTab,
   visible = true,
+  activeTab
 }: {
   setActiveTab: (tab: string) => void;
   visible?: boolean;
+  activeTab: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -343,33 +350,50 @@ function TopBar({
   return (
     <div
       ref={ref}
-      className={`w-full h-auto py-2 bg-black fixed top-0 left-0 z-50 border-b-2 border-cyan-400 shadow-[0_2px_16px_0_#22d3ee99] flex flex-col items-center justify-center gap-1
+      className={`w-full h-auto py-2 bg-black fixed left-0 z-50 border-b-2 border-cyan-400 shadow-[0_2px_16px_0_#22d3ee99] flex flex-col items-center justify-center gap-1
         ${visible ? "animate-slide-down" : "animate-slide-up"}`}
       style={{
+        top: visible ? 0 : "-100vh",
         animation: `${visible ? "slideDown" : "slideUp"} 0.35s cubic-bezier(0.4,0,0.2,1)`,
         pointerEvents: visible ? "auto" : "none"
       }}
     >
       <button
-        className="py-2 px-6 text-cyan-300 hover:bg-cyan-900/40 transition-colors font-bold text-base text-center rounded w-full max-w-xs"
+        className={`py-2 px-6 transition-all duration-200 font-bold text-base text-center rounded w-full max-w-xs border-2
+          ${activeTab === "home"
+            ? "bg-cyan-700 text-cyan-100 shadow-[0_0_16px_2px_#0891b299] border-cyan-800"
+            : "text-cyan-200 hover:bg-cyan-800/60 hover:text-cyan-100 border-transparent"}
+        `}
         onClick={() => handleTab("home")}
       >
         Strona główna
       </button>
       <button
-        className="py-2 px-6 text-cyan-300 hover:bg-cyan-900/40 transition-colors font-bold text-base text-center rounded w-full max-w-xs"
+        className={`py-2 px-6 transition-all duration-200 font-bold text-base text-center rounded w-full max-w-xs border-2
+          ${activeTab === "participants"
+            ? "bg-cyan-700 text-cyan-100 shadow-[0_0_16px_2px_#0891b299] border-cyan-800"
+            : "text-cyan-200 hover:bg-cyan-800/60 hover:text-cyan-100 border-transparent"}
+        `}
         onClick={() => handleTab("participants")}
       >
         Uczestnicy
       </button>
       <button
-        className="py-2 px-6 text-cyan-300 hover:bg-cyan-900/40 transition-colors font-bold text-base text-center rounded w-full max-w-xs"
+        className={`py-2 px-6 transition-all duration-200 font-bold text-base text-center rounded w-full max-w-xs border-2
+          ${activeTab === "rules"
+            ? "bg-cyan-700 text-cyan-100 shadow-[0_0_16px_2px_#0891b299] border-cyan-800"
+            : "text-cyan-200 hover:bg-cyan-800/60 hover:text-cyan-100 border-transparent"}
+        `}
         onClick={() => handleTab("rules")}
       >
         Regulamin
       </button>
       <button
-        className="py-2 px-6 text-cyan-300 hover:bg-cyan-900/40 transition-colors font-bold text-base text-center rounded w-full max-w-xs"
+        className={`py-2 px-6 transition-all duration-200 font-bold text-base text-center rounded w-full max-w-xs border-2
+          ${activeTab === "contact"
+            ? "bg-cyan-700 text-cyan-100 shadow-[0_0_16px_2px_#0891b299] border-cyan-800"
+            : "text-cyan-200 hover:bg-cyan-800/60 hover:text-cyan-100 border-transparent"}
+        `}
         onClick={() => handleTab("contact")}
       >
         Kontakt
